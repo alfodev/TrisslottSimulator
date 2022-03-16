@@ -11,7 +11,7 @@ public class Scratcher
         var numberOfTickets = 12_000_000;
         var totalNumberOfWins = 2_574_000;
         var totalNumberOfNonWins = numberOfTickets - totalNumberOfWins;
-        prices = new List<ProbabilityItem<int>>
+        _prices = new List<ProbabilityItem<int>>
             {
                 new ProbabilityItem<int>(totalNumberOfNonWins, 0),
                 new ProbabilityItem<int>(1_202_118, 30, "30 SEK"),
@@ -40,9 +40,12 @@ public class Scratcher
                 new ProbabilityItem<int>(6, 1_000_000, "1 000 000 SEK"),
                 new ProbabilityItem<int>(6, 2_765_000, "2 765 000 SEK")
             };
-        
+        _query = new WeightedResultQuery<int>(_prices);
+
+
     }
-    private List<ProbabilityItem<int>> prices;
+    private WeightedResultQuery<int> _query { get; }
+    private List<ProbabilityItem<int>> _prices { get; }
     private Dictionary<int, int> _nonLosses => ScratchResults.Where(x => x.Key != 0).ToDictionary(x => x.Key, x => x.Value);
     private const int TicketPrice = 30;
     public int NumberOfScratches { get; set; }
@@ -102,12 +105,12 @@ public class Scratcher
 
     public Dictionary<int,int> Scratch(int count)
     {
-        var query = new WeightedResultQuery<int>(prices);
+        
 
         var results = new Dictionary<int, int>();
         for (var i = 0; i < count; i++)
         {
-            var result = query.Execute();
+            var result = _query.Execute();
             if (!results.ContainsKey(result))
             {
                 results.Add(result, 0);
